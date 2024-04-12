@@ -1,0 +1,160 @@
+.box {
+  width: 100vw;
+  height: 100vh;
+  background-color: #808080;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  &Line {
+    display: flex;
+    &Item {
+      border: 1px solid #0000003b;
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: rgb(255, 196, 108);
+      background-color: white;
+    }
+  }
+}
+
+.panel {
+  display: flex;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  &Content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: "relative";
+    transition: "0.5s";
+    margin-right: 10px;
+    width: 200px;
+    height: 95vh;
+    background-color: white;
+    border: 3px solid #ff7474;
+    border-radius: 15px;
+    opacity: 0.99;
+    transition: left 0.5s ease;
+    &Inputblock {
+      border-radius: 15px;
+      &Item {
+        padding: 10px 0;
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        opacity: 1;
+        &__input {
+          margin: 0 auto;
+          width: 90%;
+          border: 1px solid #000;
+          border-radius: 15px;
+          opacity: 1;
+          text-align: center;
+          font-weight: bold;
+          transition: 0.3s;
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+        &Box {
+          display: flex;
+          justify-content: center;
+          margin: 0 auto;
+          &__input {
+            width: 45%;
+            border: 1px solid #000;
+            border-radius: 15px;
+            opacity: 1;
+            text-align: center;
+            font-weight: bold;
+            transition: 0.3s;
+            &:hover {
+              transform: scale(1.05);
+            }
+          }
+        }
+        &__text {
+          margin-top: 2px;
+          text-align: center;
+          opacity: 1;
+          color: #ff7474;
+          font-weight: bold;
+        }
+      }
+    }
+    &Buttonsblock {
+      margin: 0 auto;
+      margin-top: 50px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      &TimeControl {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        &Time {
+          margin-top: 10px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          justify-content: space-around;
+        }
+      }
+      &__item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        margin-top: 10px;
+        width: 90%;
+        height: 30px;
+        background-color: white;
+        border: 2px solid #ff7474;
+        border-radius: 15px;
+        transition: 0.3s;
+        &:hover {
+          transform: scale(1.05);
+        }
+        &title {
+          margin-top: 40px;
+          &timer {
+            width: 95%;
+            margin-top: 0px;
+          }
+        }
+        &Mini {
+          width: 150px;
+          margin-top: 0px;
+        }
+        &text {
+          margin-left: 5px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  &Button {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border: 3px solid #ff7474;
+    border-radius: 15px;
+    opacity: 0.9;
+    transition-duration: 0.3s;
+    cursor: pointer;
+    &:hover {
+      transition-duration: 0.3s;
+      transform: scale(1.2) rotate3d(1, 1, 1, 15deg);
+    }
+
+    &__icon {
+      font-size: 50px;
+    }
+  }
+}
