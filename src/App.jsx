@@ -57,6 +57,7 @@ function App() {
     return cells;
   };
 
+  // eslint-disable-next-line no-unused-vars
   const checkCells = () => {
     const newCells = { ...settings.cells };
     setSettings(newCells);
