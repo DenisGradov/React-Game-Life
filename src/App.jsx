@@ -22,8 +22,9 @@ function App() {
     randomCells: 5,
     cells: [],
   };
+  const defaultWorldTime = { time: 0, pause: false };
   const [settings, setSettings] = useState({ ...defaultSettings });
-  const [worldTime, setWorldTime] = useState({ time: 0, pause: false });
+  const [worldTime, setWorldTime] = useState({ ...defaultWorldTime });
 
   const generateCells = () => {
     const cells = [];
@@ -56,6 +57,24 @@ function App() {
     return cells;
   };
 
+  const checkCells = () => {
+    const newCells = { ...settings.cells };
+    setSettings(newCells);
+  };
+  useEffect(() => {
+    console.log(worldTime.time);
+    const intervalId = setInterval(() => {
+      if (!worldTime.pause) {
+        setWorldTime((prevWorldTime) => ({
+          ...prevWorldTime,
+          time: prevWorldTime.time + 1,
+        }));
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [worldTime.pause]);
+
   useEffect(() => {
     const initialCells = generateCells();
     setSettings((prevSettings) => ({ ...prevSettings, cells: initialCells }));
@@ -67,12 +86,12 @@ function App() {
   ]);
 
   function getMinutes(time) {
-    const min = Math.floor(time / 1000 / 60);
+    const min = Math.floor(time / 60);
     return min == 0 ? "00" : min < 9 ? `0${min}` : min > 99 ? "99" : min;
   }
   function getSeconds(time) {
-    const sec = (time / 100) % 60;
-    const min = Math.floor(time / 1000 / 60);
+    const sec = time % 60;
+    const min = Math.floor(time / 60);
     return sec == 0 ? "00" : sec < 9 ? `0${sec}` : min > 99 ? "99" : sec;
   }
 
@@ -162,6 +181,10 @@ function App() {
                   panelOpen: true,
                   cells: initialCells,
                 });
+
+                setWorldTime({
+                  ...defaultWorldTime,
+                });
               }}
               className={styles.panelContentButtonsblock__item}
             >
@@ -178,6 +201,9 @@ function App() {
                   ...prevSettings,
                   cells: initialCells,
                 }));
+                setWorldTime({
+                  ...defaultWorldTime,
+                });
               }}
             >
               <RiRepeatFill />
@@ -223,7 +249,13 @@ function App() {
                   )}
                 </button>
                 <h2
-                  className={`${styles.panelContentInputblockItem__text} ${styles.panelContentButtonsblock__itemtitle} ${styles.panelContentButtonsblock__itemtitletimer}`}
+                  className={`${styles.panelContentInputblockItem__text} ${
+                    styles.panelContentButtonsblock__itemtitle
+                  } ${styles.panelContentButtonsblock__itemtitletimer} ${
+                    worldTime.pause
+                      ? styles.panelContentButtonsblock__itemtitletimerpause
+                      : false
+                  }`}
                 >
                   {getMinutes(worldTime.time)}:{getSeconds(worldTime.time)}
                 </h2>

@@ -126,6 +126,15 @@
           &timer {
             width: 95%;
             margin-top: 0px;
+            &pause {
+              @keyframes blink {
+                10% {
+                  opacity: 0;
+                }
+              }
+              animation: blink 1s infinite;
+              animation-timing-function: step-start;
+            }
           }
         }
         &Mini {
