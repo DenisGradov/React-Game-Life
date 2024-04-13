@@ -178,13 +178,10 @@ function App() {
         const x1 = settings.tusk.x1;
         const y1 = settings.tusk.y1;
         const newSettings = { ...settings };
-        const obj =
-          figures[
-            newSettings.listFigures.actualFigureInGroup[
-              newSettings.listFigures.actualFigure[0]
-            ]
-          ].figure[newSettings.listFigures.actualFigure[1]].object.object;
+        const actualCategory = newSettings.listFigures.actualFigure[0];
+        const actualFigur = newSettings.listFigures.actualFigure[1];
 
+        const obj = figures[actualCategory].figure[actualFigur].object.object;
         obj.forEach((row) => {
           row.forEach((cell) => {
             const globalX = x1 + cell.position.x;
@@ -430,7 +427,7 @@ function App() {
                     event.stopPropagation();
                     if (
                       settings.listFigures.actualFigureInGroup[index] <
-                      settings.listFigures.actualFigureInGroup.length - 1
+                      figures[index].figure.length - 1
                     ) {
                       const newSettings = { ...settings };
                       newSettings.listFigures.actualFigureInGroup[index]++;
@@ -439,7 +436,7 @@ function App() {
                   }}
                   className={`${styles.panelRightBoxArrow} ${
                     settings.listFigures.actualFigureInGroup[index] ==
-                    settings.listFigures.actualFigureInGroup.length - 1
+                    figures[index].figure.length - 1
                       ? styles.panelRightBoxArrowEnd
                       : false
                   }`}
@@ -517,13 +514,19 @@ function App() {
           <div className={styles.panelContentButtonsblock}>
             <button
               onClick={() => {
-                generateCells();
+                const newListFigures = { ...settings.listFigures };
+                newListFigures.actualFigureInGroup = [];
+                for (let i in figures) {
+                  newListFigures.actualFigureInGroup.push(0);
+                }
                 setSettings({
                   ...defaultSettings,
 
                   worldTime: 0,
                   panelOpen: true,
+                  listFigures: newListFigures,
                 });
+                generateCells();
               }}
               className={styles.panelContentButtonsblock__item}
             >
