@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from "react";
 import "./App.css";
+import logo from "../public/logo.png";
 import styles from "./app.module.scss";
 import useRandom from "./hooks/useRandom";
 import {
@@ -20,23 +21,29 @@ function App() {
     sizeWorldX: 100,
     sizeWorldY: 100,
     randomCells: 5,
+    timeInTick: 1000,
     cells: [],
+    cellsForWeb: [],
+    worldTime: 0,
   };
-  const defaultWorldTime = { time: 0, pause: false };
+  const defaultWorldTime = { pause: false };
   const [settings, setSettings] = useState({ ...defaultSettings });
   const [worldTime, setWorldTime] = useState({ ...defaultWorldTime });
 
   const generateCells = () => {
     const cells = [];
-    for (let y = 0; y <= settings.sizeWorldY; y++) {
+    const cellsForWeb = [];
+    for (let y = 0; y <= settings.sizeWorldY - 1; y++) {
       let lineCells = [];
-      for (let x = 0; x <= settings.sizeWorldX; x++) {
+      let lineCellsForWeb = [];
+      for (let x = 0; x <= settings.sizeWorldX - 1; x++) {
         let newCell = { position: { x: 0, y: 0 }, color: "white" };
         newCell.position.x = x;
         newCell.position.y = y;
         newCell.color =
-          useRandom(100) < settings.randomCells ? "black" : "white";
-        lineCells.push(
+          useRandom(100) < settings.randomCells ? "#ff7474" : "white";
+        lineCells.push(newCell);
+        lineCellsForWeb.push(
           <div
             className={styles.boxLineItem}
             key={`line${y}item${x}`}
@@ -48,37 +55,123 @@ function App() {
           ></div>
         );
       }
-      cells.push(
+      cells.push(lineCells);
+      cellsForWeb.push(
         <div key={`line${y}`} className={styles.boxLine}>
-          {lineCells}
+          {lineCellsForWeb}
         </div>
       );
     }
-    return cells;
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      cells: cells,
+      cellsForWeb: cellsForWeb,
+    }));
   };
 
   // eslint-disable-next-line no-unused-vars
   const checkCells = () => {
-    const newCells = { ...settings.cells };
-    setSettings(newCells);
+    // Определение смещений для 8 соседних клеток
+    const variants = [
+      [-1, -1],
+      [0, -1],
+      [1, -1],
+      [-1, 0],
+      [1, 0],
+      [-1, 1],
+      [0, 1],
+      [1, 1],
+    ];
+
+    if (settings.cells.length > 0) {
+      const newCells = settings.cells.map((row) =>
+        row.map((cell) => ({ ...cell }))
+      );
+      const newCellsForWeb = [];
+
+      for (let y = 0; y < settings.sizeWorldY; y++) {
+        let lineCellsForWeb = [];
+        for (let x = 0; x < settings.sizeWorldX; x++) {
+          let colorCells = 0;
+
+          variants.forEach(([dy, dx]) => {
+            const newY = y + dy;
+            const newX = x + dx;
+            if (
+              newY >= 0 &&
+              newY < settings.sizeWorldY &&
+              newX >= 0 &&
+              newX < settings.sizeWorldX
+            ) {
+              if (settings.cells[newY][newX].color !== "white") {
+                colorCells += 1;
+              }
+            }
+          });
+
+          if (newCells[y][x].color === "white" && colorCells === 3) {
+            newCells[y][x].color = "#ff7474";
+          } else if (newCells[y][x].color === "#ff7474") {
+            if (colorCells < 2 || colorCells > 3) {
+              newCells[y][x].color = "white";
+            }
+          }
+
+          lineCellsForWeb.push(
+            <div
+              className={styles.boxLineItem}
+              key={`line${y}item${x}`}
+              style={{
+                width: `${settings.sizeCells}px`,
+                height: `${settings.sizeCells}px`,
+                backgroundColor: newCells[y][x].color,
+              }}
+            ></div>
+          );
+        }
+        newCellsForWeb.push(
+          <div key={`line${y}`} className={styles.boxLine}>
+            {lineCellsForWeb}
+          </div>
+        );
+      }
+
+      setSettings((prevSettings) => ({
+        ...prevSettings,
+        cells: newCells,
+        cellsForWeb: newCellsForWeb,
+        worldTime: prevSettings.worldTime + 1,
+      }));
+    }
   };
+
   useEffect(() => {
-    console.log(worldTime.time);
     const intervalId = setInterval(() => {
       if (!worldTime.pause) {
-        setWorldTime((prevWorldTime) => ({
-          ...prevWorldTime,
-          time: prevWorldTime.time + 1,
-        }));
+        checkCells();
       }
-    }, 1000);
+    }, settings.timeInTick);
 
-    return () => clearInterval(intervalId);
-  }, [worldTime.pause]);
+    return () => {
+      console.log("Clearing interval");
+      clearInterval(intervalId);
+    };
+  }, [
+    worldTime.pause,
+    settings.timeInTick,
+    settings,
+    settings.cells,
+    settings.cellsForWeb,
+  ]);
 
   useEffect(() => {
-    const initialCells = generateCells();
-    setSettings((prevSettings) => ({ ...prevSettings, cells: initialCells }));
+    setWorldTime({
+      ...defaultWorldTime,
+    });
+  }, [worldTime.timeInTick, settings]);
+
+  useEffect(() => {
+    generateCells();
   }, [
     settings.sizeCells,
     settings.sizeWorldX,
@@ -88,12 +181,12 @@ function App() {
 
   function getMinutes(time) {
     const min = Math.floor(time / 60);
-    return min == 0 ? "00" : min < 9 ? `0${min}` : min > 99 ? "99" : min;
+    return min == 0 ? "00" : min <= 9 ? `0${min}` : min > 99 ? "99" : min;
   }
   function getSeconds(time) {
     const sec = time % 60;
     const min = Math.floor(time / 60);
-    return sec == 0 ? "00" : sec < 9 ? `0${sec}` : min > 99 ? "99" : sec;
+    return sec == 0 ? "00" : sec <= 9 ? `0${sec}` : min > 99 ? "99" : sec;
   }
 
   function handlePanelOpen() {
@@ -111,10 +204,23 @@ function App() {
 
   return (
     <>
-      <div className={styles.box}>
-        {settings.cells.map((e) => {
-          return e;
-        })}
+      <div className={styles.world}>
+        <div className={styles.box}>
+          {settings.cellsForWeb.map((e) => {
+            return e;
+          })}
+        </div>
+      </div>
+      <div className={`${styles.panel} ${styles.panelRight}`}>
+        <div
+          id="panelContent"
+          className={styles.panelContent}
+          style={{
+            right: settings.panelOpen ? "0px" : "-300px",
+            position: "absolute",
+            transition: "0.5s",
+          }}
+        ></div>
       </div>
       <div className={styles.panel}>
         <div
@@ -126,6 +232,12 @@ function App() {
             transition: "0.5s",
           }}
         >
+          <a
+            className={styles.panelContentLink}
+            href="https://github.com/DenisGradov/React-Game-Life"
+          >
+            <img className={styles.panelContentLinkLogo} src={logo} />
+          </a>
           <div className={styles.panelContentInputblock}>
             <div className={styles.panelContentInputblockItem}>
               <input
@@ -169,22 +281,19 @@ function App() {
                 className={styles.panelContentInputblockItem__input}
               />
               <h2 className={styles.panelContentInputblockItem__text}>
-                Шанс черной клетки (%)
+                Шанс живой клетки (%)
               </h2>
             </div>
           </div>
           <div className={styles.panelContentButtonsblock}>
             <button
               onClick={() => {
-                const initialCells = generateCells();
+                generateCells();
                 setSettings({
                   ...defaultSettings,
-                  panelOpen: true,
-                  cells: initialCells,
-                });
 
-                setWorldTime({
-                  ...defaultWorldTime,
+                  worldTime: 0,
+                  panelOpen: true,
                 });
               }}
               className={styles.panelContentButtonsblock__item}
@@ -197,14 +306,11 @@ function App() {
             <button
               className={styles.panelContentButtonsblock__item}
               onClick={() => {
-                const initialCells = generateCells();
+                generateCells();
                 setSettings((prevSettings) => ({
                   ...prevSettings,
-                  cells: initialCells,
+                  worldTime: 0,
                 }));
-                setWorldTime({
-                  ...defaultWorldTime,
-                });
               }}
             >
               <RiRepeatFill />
@@ -258,7 +364,21 @@ function App() {
                       : false
                   }`}
                 >
-                  {getMinutes(worldTime.time)}:{getSeconds(worldTime.time)}
+                  {getMinutes(settings.worldTime)}:
+                  {getSeconds(settings.worldTime)}
+                </h2>
+              </div>
+
+              <div className={styles.panelContentInputblockItem}>
+                <input
+                  value={settings.timeInTick}
+                  onChange={(e) => {
+                    HandleChangeValue(e, "timeInTick");
+                  }}
+                  className={styles.panelContentInputblockItem__input}
+                />
+                <h2 className={styles.panelContentInputblockItem__text}>
+                  Скорость мира (мс)
                 </h2>
               </div>
             </div>
