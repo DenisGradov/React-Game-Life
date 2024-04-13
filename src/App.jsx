@@ -1,12 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useState } from "react";
+import { Image, useEffect, useState } from "react";
 import "./App.css";
 import logo from "../public/logo.png";
+import figures from "./elements";
 import styles from "./app.module.scss";
 import useRandom from "./hooks/useRandom";
 import {
   RiArrowLeftLine,
   RiArrowRightLine,
+  RiArrowRightSFill,
+  RiDeleteBin5Line,
   RiDraftLine,
   RiPauseCircleLine,
   RiPlayCircleLine,
@@ -25,7 +28,10 @@ function App() {
     cells: [],
     cellsForWeb: [],
     worldTime: 0,
+    tusk: { state: false, description: "", x: 0, y: 0 },
+    listFigures: { actualFigure: [0, 0], actualFigureInGroup: [] },
   };
+
   const defaultWorldTime = { pause: false };
   const [settings, setSettings] = useState({ ...defaultSettings });
   const [worldTime, setWorldTime] = useState({ ...defaultWorldTime });
@@ -45,6 +51,9 @@ function App() {
         lineCells.push(newCell);
         lineCellsForWeb.push(
           <div
+            onClick={() => {
+              handleCellClick(x, y);
+            }}
             className={styles.boxLineItem}
             key={`line${y}item${x}`}
             style={{
@@ -68,6 +77,25 @@ function App() {
       cellsForWeb: cellsForWeb,
     }));
   };
+
+  function handleCellClick(x, y) {
+    const objectForCreate =
+      figures[settings.listFigures.actualFigure[0]].figure[
+        settings.listFigures.actualFigure[1]
+      ].object.object;
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      tusk: {
+        state: true,
+        description: "add",
+        x1: x,
+        x2: prevSettings.sizeWorldX,
+        y1: y,
+        y2: prevSettings.sizeWorldY,
+        cells: objectForCreate,
+      },
+    }));
+  }
 
   // eslint-disable-next-line no-unused-vars
   const checkCells = () => {
@@ -117,8 +145,18 @@ function App() {
             }
           }
 
+          if (
+            settings.tusk.state &&
+            settings.tusk.description == "Clear World"
+          ) {
+            newCells[y][x].color = "white";
+          }
+
           lineCellsForWeb.push(
             <div
+              onClick={() => {
+                handleCellClick(x, y);
+              }}
               className={styles.boxLineItem}
               key={`line${y}item${x}`}
               style={{
@@ -136,24 +174,96 @@ function App() {
         );
       }
 
-      setSettings((prevSettings) => ({
-        ...prevSettings,
-        cells: newCells,
-        cellsForWeb: newCellsForWeb,
-        worldTime: prevSettings.worldTime + 1,
-      }));
+      if (settings.tusk.state && settings.tusk.description !== "Clear World") {
+        const x1 = settings.tusk.x1;
+        const y1 = settings.tusk.y1;
+        const newSettings = { ...settings };
+        const obj =
+          figures[
+            newSettings.listFigures.actualFigureInGroup[
+              newSettings.listFigures.actualFigure[0]
+            ]
+          ].figure[newSettings.listFigures.actualFigure[1]].object.object;
+
+        obj.forEach((row) => {
+          row.forEach((cell) => {
+            const globalX = x1 + cell.position.x;
+            const globalY = y1 + cell.position.y;
+
+            if (
+              globalX >= 0 &&
+              globalX < newSettings.sizeWorldX &&
+              globalY >= 0 &&
+              globalY < newSettings.sizeWorldY
+            ) {
+              newSettings.cells[globalY][globalX].color = cell.color;
+            }
+          });
+        });
+
+        const newCellsForWeb = newSettings.cells.map((row, y) => (
+          <div key={`line-${y}`} className={styles.boxLine}>
+            {row.map((cell, x) => (
+              <div
+                onClick={() => handleCellClick(x, y)}
+                key={`cell-${y}-${x}`}
+                style={{
+                  width: `${newSettings.sizeCells}px`,
+                  height: `${newSettings.sizeCells}px`,
+                  backgroundColor: cell.color,
+                }}
+                className={styles.boxLineItem}
+              ></div>
+            ))}
+          </div>
+        ));
+
+        setSettings((prevSettings) => ({
+          ...prevSettings,
+          cells: newSettings.cells,
+          cellsForWeb: newCellsForWeb,
+          tusk: { ...prevSettings.tusk, state: false },
+        }));
+        return;
+      }
+
+      if (!worldTime.pause) {
+        setSettings((prevSettings) => ({
+          ...prevSettings,
+          cells: newCells,
+          cellsForWeb: newCellsForWeb,
+          tusk: defaultSettings.tusk,
+          worldTime: prevSettings.worldTime + 1,
+        }));
+      } else if (settings.tusk.state) {
+        setSettings((prevSettings) => ({
+          ...prevSettings,
+          cells: newCells,
+          cellsForWeb: newCellsForWeb,
+          tusk: { ...prevSettings.tusk, state: false },
+        }));
+      }
     }
   };
-
+  useEffect(() => {
+    const newListFigures = { ...settings.listFigures };
+    newListFigures.actualFigureInGroup = [];
+    for (let i in figures) {
+      newListFigures.actualFigureInGroup.push(0);
+    }
+    setSettings((prevSettings) => ({
+      ...prevSettings,
+      listFigures: newListFigures,
+    }));
+  }, []);
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (!worldTime.pause) {
+      if (!worldTime.pause || settings.tusk.state) {
         checkCells();
       }
     }, settings.timeInTick);
 
     return () => {
-      console.log("Clearing interval");
       clearInterval(intervalId);
     };
   }, [
@@ -168,7 +278,7 @@ function App() {
     setWorldTime({
       ...defaultWorldTime,
     });
-  }, [worldTime.timeInTick, settings]);
+  }, [worldTime.timeInTick]);
 
   useEffect(() => {
     generateCells();
@@ -220,7 +330,126 @@ function App() {
             position: "absolute",
             transition: "0.5s",
           }}
-        ></div>
+        >
+          <button
+            className={`${styles.panelContentButtonsblock__item} ${styles.panelContentButtonsblock__itemMini}`}
+            onClick={() => {
+              setSettings((prevSettings) => ({
+                ...prevSettings,
+                tusk: {
+                  state: true,
+                  description: "Clear World",
+                  x1: 0,
+                  x2: prevSettings.sizeWorldX,
+                  y1: 0,
+                  y2: prevSettings.sizeWorldY,
+                  cells: [],
+                },
+              }));
+            }}
+          >
+            <>
+              <RiDeleteBin5Line />
+              <h2
+                className={`${styles.panelContentButtonsblock__itemtext} ${styles.panelContentButtonsblock__itemtextMini}`}
+              >
+                Очистить мир
+              </h2>
+            </>
+          </button>
+          <h2 className={styles.panelRightTitle}>Установка элементов</h2>
+          {figures.map((group, index) => (
+            <>
+              <div
+                onClick={() => {
+                  const newSettings = { ...settings };
+                  newSettings.listFigures.actualFigure = [
+                    index,
+                    settings.listFigures.actualFigureInGroup[index],
+                  ];
+                  setSettings(newSettings);
+                }}
+                key={index}
+                className={`${styles.panelRightBox} ${
+                  settings.listFigures.actualFigure[0] == index &&
+                  settings.listFigures.actualFigure[1] ==
+                    settings.listFigures.actualFigureInGroup[index]
+                    ? styles.panelRightBoxChoise
+                    : false
+                }`}
+              >
+                <div key={index} className={styles.panelRightBoxContent}>
+                  <h2 key={index} className={styles.panelRightBoxTitle}>
+                    {
+                      group.figure[
+                        settings.listFigures.actualFigureInGroup[index]
+                          ? settings.listFigures.actualFigureInGroup[index]
+                          : 0
+                      ].title
+                    }
+                  </h2>
+                  <img
+                    className={styles.panelRightBoxContentImg}
+                    src={
+                      group.figure[
+                        settings.listFigures.actualFigureInGroup[index]
+                      ]
+                        ? group.figure[
+                            settings.listFigures.actualFigureInGroup[index]
+                          ].object.img
+                        : "/logo.png"
+                    }
+                  />
+
+                  {
+                    group.figure[
+                      settings.listFigures.actualFigureInGroup[index]
+                        ? settings.listFigures.actualFigureInGroup[index]
+                        : 0
+                    ].img
+                  }
+                </div>
+                <RiArrowRightSFill
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (settings.listFigures.actualFigureInGroup[index] > 0) {
+                      const newSettings = { ...settings };
+                      newSettings.listFigures.actualFigureInGroup[index]--;
+                      setSettings(newSettings);
+                    }
+                  }}
+                  className={`${styles.panelRightBoxArrow} ${
+                    settings.listFigures.actualFigureInGroup[index] == 0
+                      ? styles.panelRightBoxArrowEnd
+                      : false
+                  }`}
+                />
+
+                <RiArrowRightSFill
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (
+                      settings.listFigures.actualFigureInGroup[index] <
+                      settings.listFigures.actualFigureInGroup.length - 1
+                    ) {
+                      const newSettings = { ...settings };
+                      newSettings.listFigures.actualFigureInGroup[index]++;
+                      setSettings(newSettings);
+                    }
+                  }}
+                  className={`${styles.panelRightBoxArrow} ${
+                    settings.listFigures.actualFigureInGroup[index] ==
+                    settings.listFigures.actualFigureInGroup.length - 1
+                      ? styles.panelRightBoxArrowEnd
+                      : false
+                  }`}
+                />
+              </div>
+
+              <h2 className={styles.panelRightBoxCategory}>{group.title}</h2>
+            </>
+          ))}
+        </div>
       </div>
       <div className={styles.panel}>
         <div

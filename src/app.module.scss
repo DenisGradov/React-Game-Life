@@ -40,6 +40,70 @@ body {
   &Right {
     position: absolute;
     right: 10px;
+    &Title {
+      font-size: 15px;
+      margin-top: 50px;
+      color: #ff7474;
+      font-weight: bold;
+    }
+    &Box {
+      position: relative;
+      width: 100px;
+      height: 100px;
+
+      border: 3px solid gray;
+      border-radius: 15px;
+      margin-top: 20px;
+      cursor: pointer;
+      &Choise {
+        border: 4px solid #ff7474;
+      }
+      &Title {
+        position: absolute;
+        top: 0px;
+        text-align: center;
+        font-weight: bold;
+      }
+      &Content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        &Img {
+          width: 50px;
+        }
+      }
+      &Arrow {
+        z-index: 1;
+        position: absolute;
+        right: -40px;
+        top: 30px;
+        font-size: 40px;
+        color: #ff7474;
+        transition: 0.3s;
+        cursor: pointer;
+        &End {
+          color: gray;
+        }
+        &:nth-child(2) {
+          left: -40px;
+          transform: rotate(-180deg);
+        }
+      }
+      &:nth-child(1) {
+        margin-top: 50px;
+      }
+      &Category {
+        margin-top: 6px;
+        color: #ff7474;
+        color: black;
+        text-align: center;
+        font-weight: bold;
+      }
+    }
   }
 
   &Content {
@@ -154,7 +218,8 @@ body {
           transform: scale(1.05);
         }
         &title {
-          margin-top: 40px;
+          font-size: 15px;
+          margin-top: 50px;
           &timer {
             width: 95%;
             margin-top: 0px;
