@@ -472,7 +472,7 @@ function App() {
                   </h2>
                   <img
                     className={styles.panelRightBoxContentImg}
-                    src={
+                    src={`../public/figures/${
                       group.figure[
                         settings.listFigures.actualFigureInGroup[index]
                       ]
@@ -480,7 +480,7 @@ function App() {
                             settings.listFigures.actualFigureInGroup[index]
                           ].object.img
                         : "/logo.png"
-                    }
+                    }`}
                   />
 
                   {
