@@ -1,5 +1,9 @@
 body {
   overflow: hidden;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .world {
   width: 100vw;
@@ -88,9 +92,23 @@ body {
         &End {
           color: gray;
         }
-        &:nth-child(2) {
+        &:nth-child(2),
+        &:nth-child(4) {
           left: -40px;
           transform: rotate(-180deg);
+        }
+        &:nth-child(1) {
+          left: 100px;
+        }
+        &:nth-child(4) {
+          font-size: 30px;
+          left: 108px;
+          margin-top: 30px;
+        }
+        &:nth-child(5) {
+          font-size: 30px;
+          left: -40px;
+          margin-top: 30px;
         }
       }
       &:nth-child(1) {
@@ -119,6 +137,15 @@ body {
           transform: scale(1.1) rotate(180deg);
           transition-duration: 0.3s;
         }
+      }
+    }
+
+    &Thema {
+      position: absolute;
+      top: 150px;
+      &__icon {
+        font-size: 30px;
+        cursor: pointer;
       }
     }
     display: flex;
@@ -179,6 +206,10 @@ body {
           opacity: 1;
           color: #ff7474;
           font-weight: bold;
+          &tick {
+            text-align: center;
+            display: block;
+          }
         }
       }
     }
@@ -188,6 +219,7 @@ body {
       display: flex;
       flex-direction: column;
       width: 100%;
+
       &TimeControl {
         display: flex;
         flex-direction: column;
@@ -253,6 +285,7 @@ body {
     border-radius: 15px;
     opacity: 0.9;
     transition-duration: 0.3s;
+
     cursor: pointer;
     &:hover {
       transition-duration: 0.3s;

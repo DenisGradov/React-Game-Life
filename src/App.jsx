@@ -6,14 +6,17 @@ import figures from "./elements";
 import styles from "./app.module.scss";
 import useRandom from "./hooks/useRandom";
 import {
+  RiArrowLeftDoubleFill,
   RiArrowLeftLine,
   RiArrowRightLine,
   RiArrowRightSFill,
   RiDeleteBin5Line,
   RiDraftLine,
+  RiMoonLine,
   RiPauseCircleLine,
   RiPlayCircleLine,
   RiRepeatFill,
+  RiSunLine,
 } from "react-icons/ri";
 
 function App() {
@@ -24,6 +27,7 @@ function App() {
     sizeWorldX: 100,
     sizeWorldY: 100,
     randomCells: 5,
+    thema: "day",
     timeInTick: 1000,
     cells: [],
     cellsForWeb: [],
@@ -32,7 +36,8 @@ function App() {
     listFigures: { actualFigure: [0, 0], actualFigureInGroup: [] },
   };
 
-  const defaultWorldTime = { pause: false };
+  const defaultWorldTime = { pause: false, time: 0 };
+
   const [settings, setSettings] = useState({ ...defaultSettings });
   const [worldTime, setWorldTime] = useState({ ...defaultWorldTime });
 
@@ -43,16 +48,27 @@ function App() {
       let lineCells = [];
       let lineCellsForWeb = [];
       for (let x = 0; x <= settings.sizeWorldX - 1; x++) {
-        let newCell = { position: { x: 0, y: 0 }, color: "white" };
+        let newCell = {
+          position: { x: 0, y: 0 },
+          color: settings.thema == "day" ? "white" : "rgb(82, 82, 82)",
+        };
         newCell.position.x = x;
         newCell.position.y = y;
         newCell.color =
-          useRandom(100) < settings.randomCells ? "#ff7474" : "white";
+          useRandom(100) < settings.randomCells
+            ? "#ff7474"
+            : settings.thema == "day"
+            ? "white"
+            : "rgb(82, 82, 82)";
         lineCells.push(newCell);
         lineCellsForWeb.push(
           <div
-            onClick={() => {
-              handleCellClick(x, y);
+            onClick={(e) => {
+              handleCellClick(x, y, "left");
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              handleCellClick(x, y, "right");
             }}
             className={styles.boxLineItem}
             key={`line${y}item${x}`}
@@ -78,7 +94,7 @@ function App() {
     }));
   };
 
-  function handleCellClick(x, y) {
+  function handleCellClick(x, y, buttonClick) {
     const objectForCreate =
       figures[settings.listFigures.actualFigure[0]].figure[
         settings.listFigures.actualFigure[1]
@@ -88,6 +104,7 @@ function App() {
       tusk: {
         state: true,
         description: "add",
+        buttonClick,
         x1: x,
         x2: prevSettings.sizeWorldX,
         y1: y,
@@ -131,17 +148,25 @@ function App() {
               newX >= 0 &&
               newX < settings.sizeWorldX
             ) {
-              if (settings.cells[newY][newX].color !== "white") {
+              if (
+                settings.cells[newY][newX].color !== "white" &&
+                settings.cells[newY][newX].color !== "rgb(82, 82, 82)"
+              ) {
                 colorCells += 1;
               }
             }
           });
 
-          if (newCells[y][x].color === "white" && colorCells === 3) {
+          if (
+            (newCells[y][x].color === "white" ||
+              newCells[y][x].color === "rgb(82, 82, 82)") &&
+            colorCells === 3
+          ) {
             newCells[y][x].color = "#ff7474";
           } else if (newCells[y][x].color === "#ff7474") {
             if (colorCells < 2 || colorCells > 3) {
-              newCells[y][x].color = "white";
+              newCells[y][x].color =
+                settings.thema == "day" ? "white" : "rgb(82, 82, 82)";
             }
           }
 
@@ -149,13 +174,18 @@ function App() {
             settings.tusk.state &&
             settings.tusk.description == "Clear World"
           ) {
-            newCells[y][x].color = "white";
+            newCells[y][x].color =
+              settings.thema == "day" ? "white" : "rgb(82, 82, 82)";
           }
 
           lineCellsForWeb.push(
             <div
               onClick={() => {
-                handleCellClick(x, y);
+                handleCellClick(x, y, "left");
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                handleCellClick(x, y, "right");
               }}
               className={styles.boxLineItem}
               key={`line${y}item${x}`}
@@ -178,8 +208,14 @@ function App() {
         const x1 = settings.tusk.x1;
         const y1 = settings.tusk.y1;
         const newSettings = { ...settings };
-        const actualCategory = newSettings.listFigures.actualFigure[0];
-        const actualFigur = newSettings.listFigures.actualFigure[1];
+        const actualCategory =
+          settings.tusk.buttonClick == "left"
+            ? newSettings.listFigures.actualFigure[0]
+            : 0;
+        const actualFigur =
+          settings.tusk.buttonClick == "left"
+            ? newSettings.listFigures.actualFigure[1]
+            : 1;
 
         const obj = figures[actualCategory].figure[actualFigur].object.object;
         obj.forEach((row) => {
@@ -202,7 +238,7 @@ function App() {
           <div key={`line-${y}`} className={styles.boxLine}>
             {row.map((cell, x) => (
               <div
-                onClick={() => handleCellClick(x, y)}
+                onClick={() => handleCellClick(x, y, "left")}
                 key={`cell-${y}-${x}`}
                 style={{
                   width: `${newSettings.sizeCells}px`,
@@ -243,16 +279,29 @@ function App() {
     }
   };
   useEffect(() => {
+    // Загрузка настроек при монтировании компонента
     const newListFigures = { ...settings.listFigures };
     newListFigures.actualFigureInGroup = [];
     for (let i in figures) {
       newListFigures.actualFigureInGroup.push(0);
     }
-    setSettings((prevSettings) => ({
-      ...prevSettings,
-      listFigures: newListFigures,
-    }));
+    const settingsFromLocalData = localStorage.getItem("settings");
+    if (settingsFromLocalData) {
+      const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
+      setSettings((prevSettings) => ({
+        ...prevSettings,
+        listFigures: settingsFromLocalObject.listFigures,
+        panelOpen: settingsFromLocalObject.panelOpen,
+        sizeCells: settingsFromLocalObject.sizeCells,
+        sizeWorldX: settingsFromLocalObject.sizeWorldX,
+        sizeWorldY: settingsFromLocalObject.sizeWorldY,
+        randomCells: settingsFromLocalObject.randomCells,
+        timeInTick: settingsFromLocalObject.timeInTick,
+        thema: settingsFromLocalObject.thema,
+      }));
+    }
   }, []);
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (!worldTime.pause || settings.tusk.state) {
@@ -270,6 +319,31 @@ function App() {
     settings.cells,
     settings.cellsForWeb,
   ]);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (!worldTime.pause) {
+        checkCells();
+      }
+    }, settings.timeInTick);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [worldTime.pause]);
+
+  useEffect(() => {
+    const intervalId2 = setInterval(() => {
+      if (!worldTime.pause) {
+        const newWorldTime = { ...worldTime };
+        newWorldTime.time = newWorldTime.time + 1;
+        setWorldTime(newWorldTime);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId2);
+    };
+  }, [worldTime]);
 
   useEffect(() => {
     setWorldTime({
@@ -303,6 +377,9 @@ function App() {
     }));
   }
   function HandleChangeValue(e, settingKey) {
+    const newSettings = { ...settings };
+    newSettings[settingKey] = e.target.value;
+    localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings((prevSettings) => ({
       ...prevSettings,
       [settingKey]: e.target.value,
@@ -326,6 +403,7 @@ function App() {
             right: settings.panelOpen ? "0px" : "-300px",
             position: "absolute",
             transition: "0.5s",
+            backgroundColor: settings.thema == "day" ? "white" : "#141414",
           }}
         >
           <button
@@ -365,6 +443,7 @@ function App() {
                     settings.listFigures.actualFigureInGroup[index],
                   ];
                   setSettings(newSettings);
+                  localStorage.setItem("settings", JSON.stringify(newSettings));
                 }}
                 key={index}
                 className={`${styles.panelRightBox} ${
@@ -376,7 +455,13 @@ function App() {
                 }`}
               >
                 <div key={index} className={styles.panelRightBoxContent}>
-                  <h2 key={index} className={styles.panelRightBoxTitle}>
+                  <h2
+                    style={{
+                      color: settings.thema == "day" ? "black" : "white",
+                    }}
+                    key={index}
+                    className={styles.panelRightBoxTitle}
+                  >
                     {
                       group.figure[
                         settings.listFigures.actualFigureInGroup[index]
@@ -441,14 +526,62 @@ function App() {
                       : false
                   }`}
                 />
+
+                <RiArrowLeftDoubleFill
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (
+                      settings.listFigures.actualFigureInGroup[index] <
+                      figures[index].figure.length - 1
+                    ) {
+                      const newSettings = { ...settings };
+                      newSettings.listFigures.actualFigureInGroup[index] =
+                        figures[index].figure.length - 1;
+                      setSettings(newSettings);
+                    }
+                  }}
+                  className={`${styles.panelRightBoxArrow} ${
+                    settings.listFigures.actualFigureInGroup[index] ==
+                    figures[index].figure.length - 1
+                      ? styles.panelRightBoxArrowEnd
+                      : false
+                  }`}
+                />
+                <RiArrowLeftDoubleFill
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (settings.listFigures.actualFigureInGroup[index] > 0) {
+                      const newSettings = { ...settings };
+                      newSettings.listFigures.actualFigureInGroup[index] = 0;
+                      setSettings(newSettings);
+                    }
+                  }}
+                  className={`${styles.panelRightBoxArrow} ${
+                    settings.listFigures.actualFigureInGroup[index] == 0
+                      ? styles.panelRightBoxArrowEnd
+                      : false
+                  }`}
+                />
               </div>
 
-              <h2 className={styles.panelRightBoxCategory}>{group.title}</h2>
+              <h2
+                style={{
+                  color: settings.thema == "day" ? "black" : "white",
+                }}
+                className={styles.panelRightBoxCategory}
+              >
+                {group.title}
+              </h2>
             </>
           ))}
         </div>
       </div>
-      <div className={styles.panel}>
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+        }}
+        className={styles.panel}
+      >
         <div
           id="panelContent"
           className={styles.panelContent}
@@ -456,6 +589,7 @@ function App() {
             left: settings.panelOpen ? "0px" : "-300px",
             position: "relative",
             transition: "0.5s",
+            backgroundColor: settings.thema == "day" ? "white" : "#141414",
           }}
         >
           <a
@@ -464,6 +598,44 @@ function App() {
           >
             <img className={styles.panelContentLinkLogo} src={logo} />
           </a>
+          <div className={styles.panelContentThema}>
+            {settings.thema == "day" ? (
+              <RiSunLine
+                style={{
+                  transition: "0.5s",
+                  color: "#141414",
+                }}
+                onClick={() => {
+                  setSettings((prevSettings) => ({
+                    ...prevSettings,
+                    thema: "night",
+                  }));
+
+                  const newSettings = { ...settings };
+                  newSettings.thema = "night";
+                  localStorage.setItem("settings", JSON.stringify(newSettings));
+                }}
+                className={styles.panelContentThema__icon}
+              />
+            ) : (
+              <RiMoonLine
+                style={{
+                  transition: "0.5s",
+                  color: "white",
+                }}
+                onClick={() => {
+                  setSettings((prevSettings) => ({
+                    ...prevSettings,
+                    thema: "day",
+                  }));
+                  const newSettings = { ...settings };
+                  newSettings.thema = "day";
+                  localStorage.setItem("settings", JSON.stringify(newSettings));
+                }}
+                className={styles.panelContentThema__icon}
+              />
+            )}
+          </div>
           <div className={styles.panelContentInputblock}>
             <div className={styles.panelContentInputblockItem}>
               <input
@@ -519,13 +691,13 @@ function App() {
                 for (let i in figures) {
                   newListFigures.actualFigureInGroup.push(0);
                 }
-                setSettings({
-                  ...defaultSettings,
+                const newSettings = { ...defaultSettings };
+                newSettings.worldTime = 0;
+                newSettings.panelOpen = true;
+                newSettings.listFigures = newListFigures;
+                setSettings(newSettings);
 
-                  worldTime: 0,
-                  panelOpen: true,
-                  listFigures: newListFigures,
-                });
+                localStorage.setItem("settings", JSON.stringify(newSettings));
                 generateCells();
               }}
               className={styles.panelContentButtonsblock__item}
@@ -596,8 +768,20 @@ function App() {
                       : false
                   }`}
                 >
-                  {getMinutes(settings.worldTime)}:
-                  {getSeconds(settings.worldTime)}
+                  {getMinutes(worldTime.time)}:{getSeconds(worldTime.time)}
+                  <h2
+                    className={`${styles.panelContentInputblockItem__text}${
+                      styles.panelContentInputblockItem__texttick
+                    } ${styles.panelContentButtonsblock__itemtitle} ${
+                      styles.panelContentButtonsblock__itemtitletimer
+                    } ${
+                      worldTime.pause
+                        ? styles.panelContentButtonsblock__itemtitletimerpause
+                        : false
+                    }`}
+                  >
+                    {"(" + settings.worldTime + ")"}
+                  </h2>
                 </h2>
               </div>
 
