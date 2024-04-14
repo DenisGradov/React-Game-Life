@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/React-Game-Life/assets/apple-touch-icon-ab986668.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAA2RJREFUWEfFl01IVFEUx39v1KJgyqimCVyElRW5sCTwC9LSpGkRVpsGwyELV9OmoIWIZiEEtZlaaGkoZW0qaaM4WRqVCeXHwsjKiaCgGuxDEwbT8cW9OPJ4zcx7NsVcmNU795zfnHPu/56rYHqpywEHsAvYBqwDkue2/wDeA4PAQ6AdlHEzrhVjIzUNOA0cBpYY20uLAHALOA/Km2h7ogCoIthZ4ASQZDKw3mwa8ABVoAioP1YEAHUj0AZs/cvA+m0vgRJQ3uo/hAFQtwOdwKp/FDzkZgwoBmVA61cHIP95738IroXI0WZCAyBr/lyf9uTk77S1HQibDFWFyUkrPt96ursL6OjYy/S0YbuIcuwI9YQW4AJwUh9p9Wo/fv8aU9Xw+VJxuVp48iTPyP4iKKeE0RyAPGrD4bpdC3D3bgm3bx+ad26xqIjvu3c/YN++dhRFJRBYQl7eYwYGMqNBiNORLo5oCKAJOBpuhxagtraK6urasI7377/HnTsHSUgI0tOTT0FBt1EWroFSroBUuE+RRMYsgIh2/foRSktvoKoKNpufsbGoB0nowloBIBTuZiTchQCUlzfS2HhcusrOfkZfX5ZRFpwC4Cpw7F8AlJW10Nzskq5yc5/S25tjBNAoAF4AETtmIRmor6+gouKKLIHd/hm/32YE0C8AhEKtjDUD+fk9dHYWs2jRL7zeIoqLvUbBxfevAmAGSDAD0NR0dL7Gwt5imcVm+4LD0YHL1UxS0jTj48vJyupjZGSzGYDgggCMPI6MbMLpvMXgoBgXTC0JYLoEExPLED/tsts/kZgY5NGjnRQW3mdmxlCKtdtlCWJqQo/Hjdt9mWAwgYyMIYaH00399Tkj2YQxHUPRA6OjG7BaJ+Vl5HC0LwRAHsOYhaimpobq6jMycFHRfbq6Cs1CSCGKWYqt1p8yC0J+h4YyyMzsZ3bWYgQRkmJhp8Z8Gbndl/B4xPiIPJItLWVGAKHLSAKYuo6j3YZCgF692kJq6js+fkwhLe01gcDSSBD661hCGA4k0QCEB6ezldbWUhm0svIcdXWVkQD0A4kECDuSrVjxDa93j3QkbrqGhoqIqRXKKGaClJQPUi+EQk5NLdbbRxrJJEQ8h9IQaFzH8nmIeD5M5iHi+TTT9k3cHqf65v0/z/Pfl6h/kusRCxsAAAAASUVORK5CYII="
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAZ1JREFUOE+lk08og2EYwH9fSglJJtSSUsptKKU2zJ+W2sGB5Kj4chBZSWpOlLYDkaJRbmsl5UBiNY3VSomTopSkRqYsmjj49H5889nWCs/pff68v+d9/rwSKaLUADLQAlR8ua+AAOAB6UR/RfpWlBxgHugHdPYfGRRgFRgB6UV4vgLVy7uAJfVFaS2HgE1ANIAHGBChExMzyLJQPyUWK8Dvb2N6elI962QFJFkCteZj7TVu9xhW6z59fWtIEhiNN7hc40Qipdhse3qAKKdOAJaAQc0jAPX1RzQ3BxPBVmuAQKAVgyHKw0ORHrIsAOdAVSZAY+MBwWATxcX3RKMGPeBCAF6BbD3AYgnR3b0OKJSXX7OwMMztbRl2+1ZyR9/SAkZH54jHc9Xg/PwnfL4eZHmF5+e8tICMJXi9vRQWPtLRsZNunmoJGZtYWXnJ2Vk1dvs2fn97MkRtYsoYk6ewuDiE2RyitvaY9/csDaKNUehKYpGczilMplO6ujYS2UpK7giHG3A4Ztnc7NTs2iKpgP+ucgLy18/0Y0N/9Z0/AFwinT2PzOKIAAAAAElFTkSuQmCC"
+    />
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiIiwic2hvcnRfbmFtZSI6IiIsImljb25zIjpbeyJzcmMiOiIvYW5kcm9pZC1jaHJvbWUtMTkyeDE5Mi5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn0seyJzcmMiOiIvYW5kcm9pZC1jaHJvbWUtNTEyeDUxMi5wbmciLCJzaXplcyI6IjUxMng1MTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIn1dLCJ0aGVtZV9jb2xvciI6IiNmZmZmZmYiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2ZmZmZmZiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIn0=" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+    <script type="module" crossorigin src="/React-Game-Life/assets/index-f9e24446.js"></script>
+    <link rel="stylesheet" href="/React-Game-Life/assets/index-140d9e47.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+  </body>
+</html>
