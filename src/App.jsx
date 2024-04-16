@@ -280,17 +280,20 @@ function App() {
   };
   useEffect(() => {
     // Загрузка настроек при монтировании компонента
-    const newListFigures = { ...settings.listFigures };
+    let newListFigures = { ...settings.listFigures };
     newListFigures.actualFigureInGroup = [];
     for (let i in figures) {
       newListFigures.actualFigureInGroup.push(0);
     }
     const settingsFromLocalData = localStorage.getItem("settings");
+    if (settingsFromLocalData.listFigures.actualFigureInGroup.length > 0) {
+      newListFigures = settingsFromLocalData.listFigures;
+    }
     if (settingsFromLocalData) {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
       setSettings((prevSettings) => ({
         ...prevSettings,
-        listFigures: settingsFromLocalObject.listFigures || newListFigures,
+        listFigures: newListFigures,
         panelOpen: settingsFromLocalObject.panelOpen,
         sizeCells: settingsFromLocalObject.sizeCells,
         sizeWorldX: settingsFromLocalObject.sizeWorldX,
