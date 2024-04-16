@@ -478,7 +478,7 @@ function App() {
                   </h2>
                   <img
                     className={styles.panelRightBoxContentImg}
-                    src={`${
+                    src={`./${
                       group.figure[
                         settings.listFigures.actualFigureInGroup[index]
                       ]
