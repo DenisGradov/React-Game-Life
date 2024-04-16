@@ -454,13 +454,8 @@ function App() {
                     : false
                 }`}
               >
-                {console.log("index", index)}
-                {console.log(
-                  "actualFigureInGroup",
-                  settings.listFigures.actualFigureInGroup
-                )}
-                {console.log("group", group)}
-                {console.log("group.figure", group.figure)}
+                {console.log("listFigures", settings.listFigures)}
+
                 {console.log(
                   "group.figure[settings.listFigures.actualFigureInGroup[index]]",
                   group.figure[settings.listFigures.actualFigureInGroup[index]]
