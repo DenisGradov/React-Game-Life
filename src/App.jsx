@@ -608,26 +608,8 @@ function App() {
             <img className={styles.panelContentLinkLogo} src={logo} />
           </a>
           <div className={styles.panelContentThema}>
-            {settings.thema == "day" ? (
+            {settings.thema != "day" ? (
               <RiSunLine
-                style={{
-                  transition: "0.5s",
-                  color: "#141414",
-                }}
-                onClick={() => {
-                  setSettings((prevSettings) => ({
-                    ...prevSettings,
-                    thema: "night",
-                  }));
-
-                  const newSettings = { ...settings };
-                  newSettings.thema = "night";
-                  localStorage.setItem("settings", JSON.stringify(newSettings));
-                }}
-                className={styles.panelContentThema__icon}
-              />
-            ) : (
-              <RiMoonLine
                 style={{
                   transition: "0.5s",
                   color: "white",
@@ -637,8 +619,26 @@ function App() {
                     ...prevSettings,
                     thema: "day",
                   }));
+
                   const newSettings = { ...settings };
                   newSettings.thema = "day";
+                  localStorage.setItem("settings", JSON.stringify(newSettings));
+                }}
+                className={styles.panelContentThema__icon}
+              />
+            ) : (
+              <RiMoonLine
+                style={{
+                  transition: "0.5s",
+                  color: "#141414",
+                }}
+                onClick={() => {
+                  setSettings((prevevSettings) => ({
+                    ...prevSettings,
+                    thema: "night",
+                  }));
+                  const newSettings = { ...settings };
+                  newSettings.thema = "night";
                   localStorage.setItem("settings", JSON.stringify(newSettings));
                 }}
                 className={styles.panelContentThema__icon}
