@@ -285,6 +285,7 @@ function App() {
     for (let i in figures) {
       newListFigures.actualFigureInGroup.push(0);
     }
+    console.log(newListFigures);
     const settingsFromLocalData = localStorage.getItem("settings");
 
     if (settingsFromLocalData) {
@@ -458,12 +459,6 @@ function App() {
                     : false
                 }`}
               >
-                {console.log("listFigures", settings.listFigures)}
-
-                {console.log(
-                  "group.figure[settings.listFigures.actualFigureInGroup[index]]",
-                  group.figure[settings.listFigures.actualFigureInGroup[index]]
-                )}
                 <div key={index} className={styles.panelRightBoxContent}>
                   <h2
                     style={{
