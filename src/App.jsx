@@ -286,11 +286,14 @@ function App() {
       newListFigures.actualFigureInGroup.push(0);
     }
     const settingsFromLocalData = localStorage.getItem("settings");
-    if (settingsFromLocalData.listFigures.actualFigureInGroup.length > 0) {
-      newListFigures = settingsFromLocalData.listFigures;
-    }
+
     if (settingsFromLocalData) {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
+      if (
+        settingsFromLocalObject.listFigures.settingsFromLocalObject.length > 0
+      ) {
+        newListFigures = settingsFromLocalObject.listFigures;
+      }
       setSettings((prevSettings) => ({
         ...prevSettings,
         listFigures: newListFigures,
