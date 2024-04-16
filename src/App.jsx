@@ -290,7 +290,7 @@ function App() {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
       setSettings((prevSettings) => ({
         ...prevSettings,
-        listFigures: settingsFromLocalObject.listFigures,
+        listFigures: settingsFromLocalObject.listFigures || newListFigures,
         panelOpen: settingsFromLocalObject.panelOpen,
         sizeCells: settingsFromLocalObject.sizeCells,
         sizeWorldX: settingsFromLocalObject.sizeWorldX,
