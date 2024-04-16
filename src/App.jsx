@@ -386,6 +386,8 @@ function App() {
   function HandleChangeValue(e, settingKey) {
     const newSettings = { ...settings };
     newSettings[settingKey] = e.target.value;
+    newSettings.cellsForWeb = 0;
+    newSettings.cells = 0;
     localStorage.setItem("settings", JSON.stringify(newSettings));
     setSettings((prevSettings) => ({
       ...prevSettings,
