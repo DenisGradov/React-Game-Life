@@ -289,9 +289,7 @@ function App() {
 
     if (settingsFromLocalData) {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
-      if (
-        settingsFromLocalObject.listFigures.settingsFromLocalObject.length > 0
-      ) {
+      if (settingsFromLocalObject.listFigures.actualFigureInGroup.length > 0) {
         newListFigures = settingsFromLocalObject.listFigures;
       }
       setSettings((prevSettings) => ({
