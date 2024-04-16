@@ -10,7 +10,7 @@ const figures = [
       {
         title: "Глайдер",
         object: {
-          img: "/figures/glider.gif",
+          img: "/glider.gif",
           object: [
             [{ position: { x: 1, y: 0 }, color: "#ff7474" }],
             [{ position: { x: 2, y: 1 }, color: "#ff7474" }],
