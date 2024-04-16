@@ -633,7 +633,7 @@ function App() {
                   color: "#141414",
                 }}
                 onClick={() => {
-                  setSettings((prevevSettings) => ({
+                  setSettings((prevSettings) => ({
                     ...prevSettings,
                     thema: "night",
                   }));
