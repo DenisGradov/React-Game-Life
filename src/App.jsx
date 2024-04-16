@@ -280,14 +280,18 @@ function App() {
   };
   useEffect(() => {
     // Загрузка настроек при монтировании компонента
+
     let newListFigures = { ...settings.listFigures };
     newListFigures.actualFigureInGroup = [];
     for (let i in figures) {
       newListFigures.actualFigureInGroup.push(0);
     }
+    const newSettings = { ...settings };
+    newSettings.listFigures = newListFigures;
+    setSettings(newSettings);
     console.log(newListFigures);
     const settingsFromLocalData = localStorage.getItem("settings");
-
+    /*
     if (settingsFromLocalData) {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
       setSettings((prevSettings) => ({
@@ -301,7 +305,7 @@ function App() {
         timeInTick: settingsFromLocalObject.timeInTick,
         thema: settingsFromLocalObject.thema,
       }));
-    }
+    }**/
   }, []);
 
   useEffect(() => {
