@@ -238,7 +238,13 @@ function App() {
           <div key={`line-${y}`} className={styles.boxLine}>
             {row.map((cell, x) => (
               <div
-                onClick={() => handleCellClick(x, y, "left")}
+                onClick={(e) => {
+                  handleCellClick(x, y, "left");
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handleCellClick(x, y, "right");
+                }}
                 key={`cell-${y}-${x}`}
                 style={{
                   width: `${newSettings.sizeCells}px`,
@@ -288,24 +294,19 @@ function App() {
     }
     const newSettings = { ...settings };
     newSettings.listFigures = newListFigures;
-    setSettings(newSettings);
-    console.log(newListFigures);
     const settingsFromLocalData = localStorage.getItem("settings");
-    /*
     if (settingsFromLocalData) {
       const settingsFromLocalObject = JSON.parse(settingsFromLocalData);
-      setSettings((prevSettings) => ({
-        ...prevSettings,
-        listFigures: newListFigures,
-        panelOpen: settingsFromLocalObject.panelOpen,
-        sizeCells: settingsFromLocalObject.sizeCells,
-        sizeWorldX: settingsFromLocalObject.sizeWorldX,
-        sizeWorldY: settingsFromLocalObject.sizeWorldY,
-        randomCells: settingsFromLocalObject.randomCells,
-        timeInTick: settingsFromLocalObject.timeInTick,
-        thema: settingsFromLocalObject.thema,
-      }));
-    }**/
+      newSettings.panelOpen = settingsFromLocalObject.panelOpen;
+      newSettings.sizeCells = settingsFromLocalObject.sizeCells;
+      newSettings.sizeWorldX = settingsFromLocalObject.sizeWorldX;
+      newSettings.sizeWorldY = settingsFromLocalObject.sizeWorldY;
+      newSettings.randomCells = settingsFromLocalObject.randomCells;
+      newSettings.timeInTick = settingsFromLocalObject.timeInTick;
+      newSettings.thema = settingsFromLocalObject.thema;
+    }
+
+    setSettings(newSettings);
   }, []);
 
   useEffect(() => {
